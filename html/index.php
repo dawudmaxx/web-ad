@@ -115,10 +115,10 @@
 
 							<!-- module 2 -->							
 							<div class="col-md-6 module auto1">
-								<div class="row">
+								<div class="row" id="twitter">
 									<div class="col-md-6">
-										<form id="form_anomalydetectionts" action="">
-										<ul>
+										<form id="form_anomalydetectionts" name="form_anomalydetectionts" action="">
+										<ul style="list-style: none;">
 											<h2>Twitter Anomaly Detection Timeseries</h2>
 										<li>
 											Datasets: <input type="text" name="x" required value="ts_Yahoo_A1Benchmark_real_1">
@@ -129,7 +129,7 @@
 									    
 									    <li>
 									    	Direction:
-								  	  	  <select>
+								  	  	  <select name="direction">
 										    <option value="both">BOTH</option>
 										    <option value="pos">POSITIVE</option>
 										    <option value="neg">NEGATIVE</option>
@@ -142,7 +142,7 @@
 									    
 									    <li>
 									    	Only Last:
-								  	  	  <select>
+								  	  	  <select name="only_last">
 										    <option value="NULL">NULL</option>
 										    <option value="day">DAY</option>
 										    <option value="hr">HOUR</option>
@@ -151,7 +151,7 @@
 									    
 									    <li>
 									    	Threshold:
-										  <select>
+										  <select name="threshold">
 										    <option value="None">NONE</option>
 										    <option value="med_max">MED MAX</option>
 										    <option value="p95">P95</option>
@@ -179,8 +179,8 @@
 									</div>
 
 									<div class="col-md-6"> <!-- Anomaly Detection Vec -->										
-										<form id="form_anomalydetectionvec" action="">
-										<ul>
+										<form id="form_anomalydetectionvec" name="form_anomalydetectionvec" action="">
+										<ul style="list-style: none;">
 											<h2>Twitter Anomaly Detection Vector</h2>
 										<li>
 											Datasets: <input type="text" name="x" required value="ts_Yahoo_A1Benchmark_real_1">
@@ -191,7 +191,7 @@
 									    
 									    <li>
 									    	Direction:
-									  	  	  <select>
+									  	  	  <select name="direction">
 											    <option value="both">BOTH</option>
 											    <option value="pos">POSITIVE</option>
 											    <option value="neg">NEGATIVE</option>
@@ -207,12 +207,12 @@
 										</li>
 
 										<li>
-											Only Last: 	<input type="checkbox" name="TRUE">
+											Only Last: 	<input type="checkbox" name="only_last">
 										</li>
 									    
 									    <li>
 									    	Threshold:
-										  <select>
+										  <select name="threshold">
 										    <option value="None">NONE</option>
 										    <option value="med_max">MED MAX</option>
 										    <option value="p95">P95</option>
@@ -221,7 +221,7 @@
 									    </li>
 									    
 									    <li>
-									    	E Value: <input type="checkbox" name="e_value" value="TRUE">	
+									    	E Value: <input type="checkbox" name="e_value">	
 									    </li>
 									    
 									    <li>
@@ -237,8 +237,9 @@
 
 								</div>
 
-									
+								<pre id="demo"></pre> <!-- Testing -->
 							</div>
+
 
 						</div>
 
@@ -256,17 +257,98 @@
 		<script type="text/javascript" src="js/jquery.min.js"></script> 
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script>
+			// to include checkboxes as boolean when calling .serialize()
+			$( document ).ready(function() {
+				(function ($) {
+				     $.fn.serialize = function (options) {
+				         return $.param(this.serializeArray(options));
+				     };
+				 
+				     $.fn.serializeArray = function (options) {
+				         var o = $.extend({
+				         checkboxesAsBools: false
+				     }, options || {});
+				 
+				     var rselectTextarea = /select|textarea/i;
+				     var rinput = /text|hidden|password|search/i;
+				 
+				     return this.map(function () {
+				         return this.elements ? $.makeArray(this.elements) : this;
+				     })
+				     .filter(function () {
+				         return this.name && !this.disabled &&
+				             (this.checked
+				             || (o.checkboxesAsBools && this.type === 'checkbox')
+				             || rselectTextarea.test(this.nodeName)
+				             || rinput.test(this.type));
+				         })
+				         .map(function (i, elem) {
+				             var val = $(this).val();
+				             return val == null ?
+				             null :
+				             $.isArray(val) ?
+				             $.map(val, function (val, i) {
+				                 return { name: elem.name, value: val };
+				             }) :
+				             {
+				                 name: elem.name,
+				                 value: (o.checkboxesAsBools && this.type === 'checkbox') ? //moar ternaries!
+				                        (this.checked ? 'TRUE' : 'FALSE') :
+				                        val
+				             };
+				         }).get();
+				     };
+				 
+				})(jQuery);
+			    //alert('unchecked checkboxes will be included');
+			});
+			
+			function getQueryParams (query = window.location.search) {
+			  return query.replace(/^\?/, '').split('&').reduce((json, item) => {
+			    if (item) {
+			      item = item.split('=').map((value) => decodeURIComponent(value))
+			      json[item[0]] = item[1]
+			    }
+			    return json
+			  }, {})
+			}
+
 			function twitter_anomaly_ts() {
 				// document.getElementById("form_anomalydetectionts").submit(); 
 				var form1 = document.getElementById('form_anomalydetectionts');
-				var query = $(form1).serialize();
-				alert(query) 
+				var form_data = $(form1).serialize({ checkboxesAsBools: true });
+				var json_str = getQueryParams(form_data);
+
+				document.getElementById("demo").innerHTML = JSON.stringify(json_str, undefined, 2);
+
+				$.ajax({
+					url: "php/decode-forms.php",
+					data: form_data,
+					type: "POST",
+					success: function(result){
+						// alert('SUCCESS '+result);
+					}
+
+				});
 			}
 
 			function twitter_anomaly_vec() {
-			    document.getElementById("form_anomalydetectionvec").submit();			
+			    // document.getElementById("form_anomalydetectionvec").submit();			
+			    var form1 = document.getElementById('form_anomalydetectionvec');
+				var form_data = $(form1).serialize({ checkboxesAsBools: true });
+				var json_str = getQueryParams(form_data);
 
+				document.getElementById("demo").innerHTML = JSON.stringify(json_str, undefined, 2);
 
+				$.ajax({
+					url: "php/decode-forms.php",
+					data: form_data,
+					type: "POST",
+					success: function(result){
+						// alert('SUCCESS '+result);
+					}
+
+				});
 			}
 		</script>
 	</body>
