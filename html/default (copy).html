@@ -1,0 +1,76 @@
+
+<html>
+
+<head>
+	<title>Anomaly Detection</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+
+<body>
+	 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+<section>
+	<article class="index-form">
+		<div class="container">
+			<h1>NAB</h1>
+
+			<div class="row">				
+				<div class="col-sm-12">
+					<form>
+
+						<div class="btn-group dropright">
+						    <button type="button" class="btn btn-primary">Choose datasets</button>
+						    <button type="button" class="btn btn-primary dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						        <span class="sr-only">Toggle Dropdown</span>
+						    </button>
+						    <div class="dropdown-menu">
+						        <a class="dropdown-item" href="#">Action</a>
+						        <a class="dropdown-item" href="#">Another action</a>
+						        <a class="dropdown-item" href="#">Something else here</a>
+						        <div class="dropdown-divider"></div>
+						        <a class="dropdown-item" href="#">Separated link</a>
+						    </div>
+						</div>
+                						
+						<div class="checkbox">
+							<label for="name">Method:</label>							
+							<label class="checkbox-inline"><input type="checkbox" value="">Numenta</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">Null</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">Random</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">Skyline</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">BayesChangePt</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">WindowedGaussian</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">Expose</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">RelativeEntropy</label>
+						</div>
+						
+						<div class="checkbox">
+							<label for="name">Parameters:</label>							
+							<label class="checkbox-inline"><input type="checkbox" value="">detect</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">optimize</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">score</label>
+							<label class="checkbox-inline"><input type="checkbox" value="">normalize</label>
+						</div>
+						
+						<button type="button" class="btn btn-warning">Execute</button>
+					</form>		
+				</div>
+				<!--
+				<div class="col-sm-12"> </div>
+				<div class="col-sm-12"> </div>
+				-->
+			</div>
+		</div>		
+	</article>
+</section>
+
+
+</body>
+</html>
