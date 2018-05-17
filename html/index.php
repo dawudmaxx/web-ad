@@ -345,16 +345,23 @@
 		<script>			
 			$(document).ready(function(){
 				$("#overlay_input").focus();
+				var user = '<?php echo $user ?>';
+				var uid = '<?php echo $newid ?>';
+
+				var location = window.location.href;
+		        if (location.includes('?')){
+		        	var n = location.indexOf('?');
+		        	location = 	location.substring(0,n);			        	
+		        }
 
 				$("#overlay_input").on('keyup', function (e) {
-				    if (e.keyCode == 13) {
-				        var location = window.location.href;
-				        if (location.includes('?')){
-				        	var n = location.indexOf('?');
-				        	location = 	location.substring(0,n);			        	
-				        }				        
+				    if (e.keyCode == 13) {				        				        
 				        window.open(location+'?user='+document.getElementById('overlay_input').value, '_self');
 				    }
+				});
+
+				$('.logout').on('click', function (e){
+					 window.open(location, '_self');
 				});
 			});
 			function twitter_anomaly_ts() {
