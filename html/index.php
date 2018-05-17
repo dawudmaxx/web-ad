@@ -1,7 +1,79 @@
+<?php
+	// for every user first time generate a unique id which is later used for referencing him
+	session_start();
+	$user = strtolower($_GET['user']);
+	$newid = uniqid();
+	$hide_overlay = FALSE;
+
+	// check for the user in database ad-users (id, uname, uid)
+	if (isset($user) && $user != ''){		
+		$servername = "127.0.0.1";
+		$username = "root";
+		$password = "sither04";
+		$dbname = "ad-users";
+
+		// Create connection
+		$conn = new mysqli($servername, $username, $password, $dbname);
+		// Check connection
+		if ($conn->connect_error) {
+		    die("Connection failed: " . $conn->connect_error);
+		} 
+
+		$sql = "SELECT * FROM users WHERE uname='".$user."'";
+		$result = $conn->query($sql);
+
+		if ($result->num_rows > 0) {
+		    // output data of each row
+		    while($row = $result->fetch_assoc()) {
+		        echo " uid: " . $row["uid"];
+		    }
+		    $newid = $row["uid"];
+		} else {
+		    echo "0 results";
+		    $sql = "INSERT INTO users (uname, uid) VALUES ('$user', '$newid')";
+		    if ($conn->query($sql) === TRUE) {
+			    echo "New record created successfully";
+			} else {
+			    echo "Error: " . $sql . "<br>" . $conn->error;
+			}
+		}
+		$hide_overlay = TRUE;
+		$conn->close();
+	}
+?>
 <!DOCTYPE html>
 
 <html lang="en">
 	<head>
+		<style>
+		#overlay {
+		    position: fixed;
+		    display: block;
+		    width: 100%;
+		    height: 100%;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background-color: rgba(0,0,0,0.5);
+		    z-index: 2;
+		    cursor: pointer;
+		}
+		#namediv{
+			margin-top: 500px;
+			color: #fff;
+			font-size: 98px;
+			text-align: center;
+		}
+		#namediv input{
+			width: 500px;
+			height: 100px;
+			font-size: 70px;
+			display: inline-block;
+			color: rgba(0,0,0,0.5);
+			padding: 10px;
+		}		
+		</style>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE-edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,6 +86,17 @@
 	</head>
 
 	<body>
+		<?php
+			if (!$hide_overlay){
+		?>
+			<div id="overlay">			
+				<div id="namediv">
+					User: <input type="text" name="username" id="overlay_input">
+				</div>
+			</div>
+		<?php
+			}
+		?>
 		<div class="banner">			
 			<h1>Anomaly Detection Modules</h1>
 		</div>
@@ -29,7 +112,9 @@
 								</div>
 								<div class="col-md-7">
 									<ul class="pull-right">
-										<li id="welcome">Welcome to main panel</li>
+
+										<li id="welcome">Welcome <?php echo strtoupper($user) ?> to the main panel</li>
+										
 										<li class="fixed-width">
 											<a href="#">
 												<span class="glyphicon glyphicon-bell" aria-hidden="true"></span>
@@ -237,7 +322,7 @@
 
 								</div>
 
-								<pre id="demo"></pre> <!-- Testing -->
+								<pre id="twitterdemo"></pre> <!-- Testing -->
 							</div>
 
 
@@ -256,99 +341,42 @@
 		<!-- jQuery and Bootstrap -->
 		<script type="text/javascript" src="js/jquery.min.js"></script> 
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script>
-			// to include checkboxes as boolean when calling .serialize()
-			$( document ).ready(function() {
-				(function ($) {
-				     $.fn.serialize = function (options) {
-				         return $.param(this.serializeArray(options));
-				     };
-				 
-				     $.fn.serializeArray = function (options) {
-				         var o = $.extend({
-				         checkboxesAsBools: false
-				     }, options || {});
-				 
-				     var rselectTextarea = /select|textarea/i;
-				     var rinput = /text|hidden|password|search/i;
-				 
-				     return this.map(function () {
-				         return this.elements ? $.makeArray(this.elements) : this;
-				     })
-				     .filter(function () {
-				         return this.name && !this.disabled &&
-				             (this.checked
-				             || (o.checkboxesAsBools && this.type === 'checkbox')
-				             || rselectTextarea.test(this.nodeName)
-				             || rinput.test(this.type));
-				         })
-				         .map(function (i, elem) {
-				             var val = $(this).val();
-				             return val == null ?
-				             null :
-				             $.isArray(val) ?
-				             $.map(val, function (val, i) {
-				                 return { name: elem.name, value: val };
-				             }) :
-				             {
-				                 name: elem.name,
-				                 value: (o.checkboxesAsBools && this.type === 'checkbox') ? //moar ternaries!
-				                        (this.checked ? 'TRUE' : 'FALSE') :
-				                        val
-				             };
-				         }).get();
-				     };
-				 
-				})(jQuery);
-			    //alert('unchecked checkboxes will be included');
-			});
-			
-			function getQueryParams (query = window.location.search) {
-			  return query.replace(/^\?/, '').split('&').reduce((json, item) => {
-			    if (item) {
-			      item = item.split('=').map((value) => decodeURIComponent(value))
-			      json[item[0]] = item[1]
-			    }
-			    return json
-			  }, {})
-			}
+		<script type="text/javascript" src="js/utils.js"></script>
+		<script>			
+			$(document).ready(function(){
+				$("#overlay_input").focus();
 
-			function twitter_anomaly_ts() {
-				// document.getElementById("form_anomalydetectionts").submit(); 
-				var form1 = document.getElementById('form_anomalydetectionts');
-				var form_data = $(form1).serialize({ checkboxesAsBools: true });
-				var json_str = getQueryParams(form_data);
-
-				document.getElementById("demo").innerHTML = JSON.stringify(json_str, undefined, 2);
-
-				$.ajax({
-					url: "php/decode-forms.php",
-					data: form_data,
-					type: "POST",
-					success: function(result){
-						// alert('SUCCESS '+result);
-					}
-
+				$("#overlay_input").on('keyup', function (e) {
+				    if (e.keyCode == 13) {
+				        var location = window.location.href;
+				        if (location.includes('?')){
+				        	var n = location.indexOf('?');
+				        	location = 	location.substring(0,n);			        	
+				        }				        
+				        window.open(location+'?user='+document.getElementById('overlay_input').value, '_self');
+				    }
 				});
+			});
+			function twitter_anomaly_ts() {
+				// document.getElementById("form_anomalydetectionts").submit(); 				
+				var json_js_obj = formDataToJSON('form_anomalydetectionts');
+				var json_html = JSON.stringify(json_js_obj, undefined, 2); // formatted for html				
+				var obj = JSON.parse(JSON.stringify(json_js_obj));
+				var json_data = JSON.stringify(obj);							
+				
+				<?php $test = array('red'=>'apple', 'yellow'=>'banana', 'orange'=>'orange', 'peach'=>'peach') ?>
+				var obj1 = JSON.parse('<?php echo json_encode($test) ?>');
+				document.getElementById("twitterdemo").innerHTML = JSON.stringify(obj1, undefined, 2);
+				var unq_id = '<?php echo $newid ?>';
+
+				alert(unq_id);
 			}
 
 			function twitter_anomaly_vec() {
 			    // document.getElementById("form_anomalydetectionvec").submit();			
-			    var form1 = document.getElementById('form_anomalydetectionvec');
-				var form_data = $(form1).serialize({ checkboxesAsBools: true });
-				var json_str = getQueryParams(form_data);
-
-				document.getElementById("demo").innerHTML = JSON.stringify(json_str, undefined, 2);
-
-				$.ajax({
-					url: "php/decode-forms.php",
-					data: form_data,
-					type: "POST",
-					success: function(result){
-						// alert('SUCCESS '+result);
-					}
-
-				});
+				var json_js_obj = formDataToJSON('form_anomalydetectionvec');
+				var json_html = JSON.stringify(json_js_obj, undefined, 2);
+				document.getElementById("twitterdemo").innerHTML = json_html;
 			}
 		</script>
 	</body>
