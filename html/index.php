@@ -25,11 +25,11 @@
 		if ($result->num_rows > 0) {
 		    // output data of each row
 		    while($row = $result->fetch_assoc()) {
-		        echo " uid: " . $row["uid"];
+		        // echo " uid: " . $row["uid"];
 		    }
 		    $newid = $row["uid"];
 		} else {
-		    echo "0 results";
+		    echo "0 results, ";
 		    $sql = "INSERT INTO users (uname, uid) VALUES ('$user', '$newid')";
 		    if ($conn->query($sql) === TRUE) {
 			    echo "New record created successfully";
@@ -199,7 +199,7 @@
 							</div>
 
 							<!-- module 2 -->							
-							<div class="col-md-6 module auto1">
+							<div class="col-md-5 module auto1">
 								<div class="row" id="twitter">
 									<div class="col-md-6">
 										<form id="form_anomalydetectionts" name="form_anomalydetectionts" action="">
@@ -323,8 +323,16 @@
 								</div>
 
 								<pre id="twitterdemo"></pre> <!-- Testing -->
-							</div>
+							</div> <!-- twitter column ENDs -->
 
+							<div class="col-md-1 module services">
+								<h3 style="color: blue; text-align: center; margin: 2px;">Algos Status</h3>
+
+								<ul class="services" style="list-style: none; padding: 0px; margin-top: 5px; margin-bottom: 2px;">
+									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo1 </a> </li>
+									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo2 </a> </li>
+								</ul>
+							</div> <!-- services column ENDs -->
 
 						</div>
 
@@ -362,21 +370,34 @@
 
 				$('.logout').on('click', function (e){
 					 window.open(location, '_self');
-				});
+				});				
 			});
+
 			function twitter_anomaly_ts() {
 				// document.getElementById("form_anomalydetectionts").submit(); 				
-				var json_js_obj = formDataToJSON('form_anomalydetectionts');
-				var json_html = JSON.stringify(json_js_obj, undefined, 2); // formatted for html				
-				var obj = JSON.parse(JSON.stringify(json_js_obj));
-				var json_data = JSON.stringify(obj);							
+				var json_obj = formDataToJSON('form_anomalydetectionts');
+				var json_html = JSON.stringify(json_obj, undefined, 2); // formatted for html												
+				var data={"x":"product","max_anoms":"riserva wine glass"};
+				// document.getElementById("twitterdemo").innerHTML = json_html;
+				// console.log(json_html);
 				
-				<?php $test = array('red'=>'apple', 'yellow'=>'banana', 'orange'=>'orange', 'peach'=>'peach') ?>
-				var obj1 = JSON.parse('<?php echo json_encode($test) ?>');
-				document.getElementById("twitterdemo").innerHTML = JSON.stringify(obj1, undefined, 2);
-				var unq_id = '<?php echo $newid ?>';
+				$.ajax({
+				   type: "POST",
+				   url: "php/decode-forms.php",
+				   async: false,
+				   data: {jsondata: JSON.stringify(json_obj)},
+				   success: function(data){
+		   			  document.getElementById("twitterdemo").innerHTML = data;
+				      //console.log(data);
+				      return true;
+				   },
+				   complete: function() {},
+				   error: function(xhr, textStatus, errorThrown) {
+				     console.log('ajax loading error...');
+				     return false;
+				   }
+				});
 
-				alert(unq_id);
 			}
 
 			function twitter_anomaly_vec() {
@@ -385,6 +406,7 @@
 				var json_html = JSON.stringify(json_js_obj, undefined, 2);
 				document.getElementById("twitterdemo").innerHTML = json_html;
 			}
+			
 		</script>
 	</body>
 
