@@ -301,7 +301,7 @@
 													<h2>Twitter Anomaly Detection Vector</h2>
 												<li>
 													Datasets: 
-													<select name="x">
+													<select id="x" name="x">
 													<?php 
 														$servername = "127.0.0.1";
 														$username = "root";
@@ -438,17 +438,42 @@
 				var json_obj = formDataToJSON('form_anomalydetectionts');
 				var json_html = JSON.stringify(json_obj, undefined, 2); // formatted for html												
 				var data={"x":"product","max_anoms":"riserva wine glass"};
-				// document.getElementById("twitterdemo").innerHTML = json_html;
-				// console.log(json_html);
-				
+				document.getElementById("twitterdemo").innerHTML = json_html;
+				// console.log(json_html);			
 				$.ajax({
 				   type: "POST",
 				   url: "php/decode-forms.php",
-				   async: false,
+				   async: true,
 				   data: {jsondata: JSON.stringify(json_obj)},
 				   success: function(data){
-		   			  document.getElementById("twitterdemo").innerHTML = data;
-				      //console.log(data);
+		   			  // document.getElementById("twitterdemo").innerHTML = data;
+				      console.log(data);
+				      return true;
+				   },
+				   complete: function() {},
+				   error: function(xhr, textStatus, errorThrown) {
+				     console.log('ajax loading error...');
+				     return false;
+				   }
+				});	
+			}
+
+			function twitter_anomaly_vec() {
+			    // document.getElementById("form_anomalydetectionvec").submit();			
+				var json_obj = formDataToJSON('form_anomalydetectionvec');
+				var json_html = JSON.stringify(json_obj, undefined, 2);
+				var x = JSON.stringify(getQueryParams($('#form_anomalydetectionvec #x').serialize()));
+				document.getElementById("twitterdemo").innerHTML = JSON.stringify(json_obj);
+
+				$.ajax({
+				   type: "POST",
+				   url: "http://localhost:8000/twitter",
+				   async: true,
+				   //data: '{"x":"ts_Yahoo_A1Benchmark_real_1"}',
+				   data: JSON.stringify(json_obj),
+	    		   //data: "\'" + d + "\'",
+				   success: function(data){
+				      console.log(data);
 				      return true;
 				   },
 				   complete: function() {},
@@ -457,14 +482,6 @@
 				     return false;
 				   }
 				});
-
-			}
-
-			function twitter_anomaly_vec() {
-			    // document.getElementById("form_anomalydetectionvec").submit();			
-				var json_js_obj = formDataToJSON('form_anomalydetectionvec');
-				var json_html = JSON.stringify(json_js_obj, undefined, 2);
-				document.getElementById("twitterdemo").innerHTML = json_html;
 			}
 			
 		</script>
