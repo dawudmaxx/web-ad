@@ -151,7 +151,7 @@
 								<!-- modules -->
 								<div class="row modules">
 									<!-- module 1 -->
-									<div class="col-md-6 module nab">
+									<div class="col-md-4 module nab">
 										<div class="row">
 											<a href="#" class="clearfix">
 											<span class="glyphicon glyphicon-chevron-right pull-right" id="right-arrow" aria-hidden="true"></span>
@@ -160,7 +160,23 @@
 												<ul style="list-style: none;">
 													<h2>NAB Numenta</h2>
 													<li>
-														Datasets: <input type="text" name="x" required value="ts_Yahoo_A1Benchmark_real_1">
+														Datasets: 
+														<select name="x">
+														<?php 
+															$servername = "127.0.0.1";
+															$username = "root";
+															$password = "sither04";
+															$dbname = "ad";
+															$conn = new mysqli($servername, $username, $password, $dbname);
+															$sql = "SHOW TABLES";
+															$datasets = $conn->query($sql);
+															$format = '<option value="%s">%s</option>';
+															while($row = $datasets->fetch_assoc()) {
+													        	echo sprintf($format, $row["Tables_in_ad"], $row["Tables_in_ad"]);
+													    	}
+													    	$conn->close();
+													    ?>
+														</select>
 													</li>												    
 												    <li>
 												    	Method:
@@ -199,14 +215,30 @@
 									</div> <!-- END of module 1 -->
 
 									<!-- module 2 -->							
-									<div class="col-md-6 module auto1">
+									<div class="col-md-8 module auto1">
 										<div class="row" id="twitter">
 											<div class="col-md-6">
 												<form id="form_anomalydetectionts" name="form_anomalydetectionts" action="">
 												<ul style="list-style: none;">
 													<h2>Twitter Anomaly Detection Timeseries</h2>
 												<li>
-													Datasets: <input type="text" name="x" required value="ts_Yahoo_A1Benchmark_real_1">
+													Datasets:
+													<select name="x">
+													<?php 
+														$servername = "127.0.0.1";
+														$username = "root";
+														$password = "sither04";
+														$dbname = "ad";
+														$conn = new mysqli($servername, $username, $password, $dbname);
+														$sql = "SHOW TABLES";
+														$datasets = $conn->query($sql);
+														$format = '<option value="%s">%s</option>';
+														while($row = $datasets->fetch_assoc()) {
+												        	echo sprintf($format, $row["Tables_in_ad"], $row["Tables_in_ad"]);
+												    	}
+												    	$conn->close();
+												    ?>
+													</select>
 												</li>
 												<li>
 													Max Anomaly: <input type="text" name="max_anoms" value="0.1">	
@@ -268,7 +300,23 @@
 												<ul style="list-style: none;">
 													<h2>Twitter Anomaly Detection Vector</h2>
 												<li>
-													Datasets: <input type="text" name="x" required value="ts_Yahoo_A1Benchmark_real_1">
+													Datasets: 
+													<select name="x">
+													<?php 
+														$servername = "127.0.0.1";
+														$username = "root";
+														$password = "sither04";
+														$dbname = "ad";
+														$conn = new mysqli($servername, $username, $password, $dbname);
+														$sql = "SHOW TABLES";
+														$datasets = $conn->query($sql);
+														$format = '<option value="%s">%s</option>';
+														while($row = $datasets->fetch_assoc()) {
+												        	echo sprintf($format, $row["Tables_in_ad"], $row["Tables_in_ad"]);
+												    	}
+												    	$conn->close();
+												    ?>
+													</select>
 												</li>
 												<li>
 													Max Anomaly: <input type="text" name="max_anoms" value="0.1">	
