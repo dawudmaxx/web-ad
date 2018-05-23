@@ -485,7 +485,6 @@
 				// document.getElementById("form_anomalydetectionvec").submit();							
 				var json_obj = formDataToJSON('form_anomalydetectionvec');			
 				json_obj["input_db"] = "ad";
-				json_obj["input_table"] = "ts_Yahoo_A1Benchmark_real_1"; // TODO
 				json_obj['uid'] = "<?php echo $uid ?>";
 				var x = JSON.stringify(getQueryParams($('#form_anomalydetectionvec #x').serialize()));
 
