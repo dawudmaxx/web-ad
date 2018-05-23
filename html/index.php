@@ -389,7 +389,8 @@
 										$password = "sither04";
 										$dbname = "ad-services";
 										$conn = new mysqli($servername, $username, $password, $dbname);
-										$sql = "SELECT * FROM services ORDER BY id DESC";
+										// $sql = "SELECT * FROM services WHERE uid=".$uid." ORDER BY id DESC";
+										$sql = sprintf("SELECT * FROM services WHERE uid='%s' ORDER BY id DESC", $uid);
 										$datasets = $conn->query($sql);				
 										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="%s"> %s - %d </a> </li>';
 
@@ -440,7 +441,11 @@
 
 				$('.logout').on('click', function (e){
 					 window.open(location, '_self');
-				});				
+				});			
+
+
+				// REMOVE
+				$("#form_anomalydetectionvec option:last").attr("selected", "selected"); 
 			});
 
 			function nab_numenta(){
@@ -482,7 +487,6 @@
 				json_obj["input_db"] = "ad";
 				json_obj["input_table"] = "ts_Yahoo_A1Benchmark_real_1"; // TODO
 				json_obj['uid'] = "<?php echo $uid ?>";
-				json_obj['process_name'] = "Twitter Vec";
 				var x = JSON.stringify(getQueryParams($('#form_anomalydetectionvec #x').serialize()));
 
 				// serviceid
@@ -496,14 +500,7 @@
 		      		  serviceid = data;
 		      		  json_obj["serviceid"] = serviceid;
 		      		  var json_html = JSON.stringify(json_obj, undefined, 2);
-
 		      		  // document.getElementById("twitterdemo").innerHTML = json_html;
-
-		      		  var location = window.location.href;
-		      		  if (location.includes('?')){
-    	    			var n = location.indexOf('?');
-			        	location = 	location.substring(0,n);			        	
-			          }
 		          
 		      		  // call the R method
 		      		  $.ajax({
@@ -519,7 +516,7 @@
 								   type: "POST",
 								   url: "php/algo.php",
 								   async: true,
-								   data: {"serviceid":json_obj['serviceid'], "actual_link":location},
+								   data: {"serviceid":json_obj['serviceid']},
 								   success: function(data){  		
 								   	  $("#services").prepend(data);						   	  
 								      // console.log(data);
