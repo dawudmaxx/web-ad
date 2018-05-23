@@ -2,7 +2,7 @@
 	// for every user first time generate a unique id which is later used for referencing him
 	session_start();
 	$user = strtolower($_GET['user']);
-	$newid = uniqid();
+	$uid = uniqid();
 	$hide_overlay = false;
 
 	// check for the user in database ad-users (id, uname, uid)
@@ -27,10 +27,10 @@
 		    while($row = $result->fetch_assoc()) {
 		        // echo " uid: " . $row["uid"];
 		    }
-		    $newid = $row["uid"];
+		    $uid = $row["uid"];
 		} else {
 		    echo "0 results, ";
-		    $sql = "INSERT INTO users (uname, uid) VALUES ('$user', '$newid')";
+		    $sql = "INSERT INTO users (uname, uid) VALUES ('$user', '$uid')";
 		    if ($conn->query($sql) === TRUE) {
 			    echo "New record created successfully";
 			} else {
@@ -391,17 +391,19 @@
 										$dbname = "ad-services";
 										$conn = new mysqli($servername, $username, $password, $dbname);
 										$sql = "SELECT * FROM services ORDER BY id DESC";
-										$datasets = $conn->query($sql);
+										$datasets = $conn->query($sql);				
+										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="%s"> %s </a> </li>';
 
-										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> %s </a> </li>';
+										$actual_link = "http://" . $_SERVER['SERVER_NAME'];
 										while($row = $datasets->fetch_assoc()) {
-								        	echo sprintf($format, $row["id"]);
+											// $url = $strtok($_SERVER["REQUEST_URI"],'?');
+								        	echo sprintf($format, $actual_link."/results?user=".$user."&serviceid=".$row["serviceid"], $row["process_name"]);
 								    	}
 								    	$conn->close();
 								    ?>
 
-									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo1 </a> </li>
-									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo2 </a> </li>
+									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="#"> Demo1 </a> </li>
+									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="#"> Demo2 </a> </li>
 								</ul>
 							</div> <!-- services column ENDs -->
 						</div><!-- main row div ENDs -->
@@ -424,7 +426,7 @@
 			$(document).ready(function(){
 				$("#overlay_input").focus();
 				var user = '<?php echo $user ?>';
-				var uid = '<?php echo $newid ?>';
+				var uid = '<?php echo $uid ?>';
 
 				var location = window.location.href;
 		        if (location.includes('?')){
