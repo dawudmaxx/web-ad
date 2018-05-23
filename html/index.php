@@ -384,6 +384,22 @@
 								<h3 style="color: blue; text-align: center; margin: 2px;">Algos Status</h3>
 
 								<ul class="services" style="list-style: none; padding: 0px; margin-top: 5px; margin-bottom: 2px;">
+									<?php 
+										$servername = "127.0.0.1";
+										$username = "root";
+										$password = "sither04";
+										$dbname = "ad-services";
+										$conn = new mysqli($servername, $username, $password, $dbname);
+										$sql = "SELECT * FROM services ORDER BY id DESC";
+										$datasets = $conn->query($sql);
+
+										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> %s </a> </li>';
+										while($row = $datasets->fetch_assoc()) {
+								        	echo sprintf($format, $row["id"]);
+								    	}
+								    	$conn->close();
+								    ?>
+
 									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo1 </a> </li>
 									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;> <a href="#"> Demo2 </a> </li>
 								</ul>
@@ -438,8 +454,8 @@
 				var json_obj = formDataToJSON('form_anomalydetectionts');
 				var json_html = JSON.stringify(json_obj, undefined, 2); // formatted for html												
 				var data={"x":"product","max_anoms":"riserva wine glass"};
-				document.getElementById("twitterdemo").innerHTML = json_html;
-				// console.log(json_html);			
+				document.getElementById("twitterdemo").innerHTML = json_html;				
+
 				$.ajax({
 				   type: "POST",
 				   url: "php/decode-forms.php",
@@ -452,33 +468,57 @@
 				   },
 				   complete: function() {},
 				   error: function(xhr, textStatus, errorThrown) {
-				     console.log('ajax loading error...');
+				     console.log('twitter_anomaly_ts ajax loading error...');
 				     return false;
 				   }
 				});	
-			}
+			}		
 
-			function twitter_anomaly_vec() {
-			    // document.getElementById("form_anomalydetectionvec").submit();			
-				var json_obj = formDataToJSON('form_anomalydetectionvec');
-				var json_html = JSON.stringify(json_obj, undefined, 2);
+				
+
+			function twitter_anomaly_vec() {		
+				// document.getElementById("form_anomalydetectionvec").submit();							
+				var json_obj = formDataToJSON('form_anomalydetectionvec');			
+				json_obj["input_db"] = "ad";
+				json_obj["input_table"] = "ts_Yahoo_A1Benchmark_real_1"; // TODO
 				var x = JSON.stringify(getQueryParams($('#form_anomalydetectionvec #x').serialize()));
-				document.getElementById("twitterdemo").innerHTML = JSON.stringify(json_obj);
 
+				// serviceid
+				var serviceid = '-1';
 				$.ajax({
 				   type: "POST",
-				   url: "http://localhost:8000/twitter",
+				   url: "php/generate-uid.php",
 				   async: true,
-				   //data: '{"x":"ts_Yahoo_A1Benchmark_real_1"}',
-				   data: JSON.stringify(json_obj),
-	    		   //data: "\'" + d + "\'",
 				   success: function(data){
 				      console.log(data);
+		      		  serviceid = data;
+		      		  json_obj["serviceid"] = serviceid;
+		      		  var json_html = JSON.stringify(json_obj, undefined, 2);
+		      		  document.getElementById("twitterdemo").innerHTML = json_html;
+
+		      		  // call the R method
+		      		  $.ajax({
+						   type: "POST",
+						   url: "http://localhost:8000/twitter",
+						   async: true,
+						   //data: '{"x":"ts_Yahoo_A1Benchmark_real_1"}',
+						   data: JSON.stringify(json_obj),
+						   success: function(data){
+						      console.log(data);
+						      return true;
+						   },
+						   complete: function() {},
+						   error: function(xhr, textStatus, errorThrown) {
+						     console.log('twittervec R ajax loading error...');
+						     return false;
+						   }
+						});
+
 				      return true;
 				   },
 				   complete: function() {},
 				   error: function(xhr, textStatus, errorThrown) {
-				     console.log('ajax loading error...');
+				     console.log('twittervec php ajax loading error...');
 				     return false;
 				   }
 				});
