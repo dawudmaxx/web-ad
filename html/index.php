@@ -23,10 +23,7 @@
 		$result = $conn->query($sql);
 
 		if ($result->num_rows > 0) {
-		    // output data of each row
-		    while($row = $result->fetch_assoc()) {
-		        // echo " uid: " . $row["uid"];
-		    }
+			$row = $result->fetch_assoc();
 		    $uid = $row["uid"];
 		} else {
 		    echo "0 results, ";
@@ -373,17 +370,19 @@
 										<pre id="twitterdemo"></pre> <!-- Testing -->
 									</div> <!-- END of module 2 -->	
 
-									<!-- rapid miner module -->
+									<!-- rapid miner module 
+
 									<div class="col-md-6">
 										<h2>Rapidminer Anomaly Detection Extension</h2>
 									</div>					
+									-->
 								</div>
 							</div> 
 
 							<div class="col-md-1 module services">
 								<h3 style="color: blue; text-align: center; margin: 2px;">Algos Status</h3>
 
-								<ul class="services" style="list-style: none; padding: 0px; margin-top: 5px; margin-bottom: 2px;">
+								<ul class="services" id="services" style="list-style: none; padding: 0px; margin-top: 5px; margin-bottom: 2px;">
 									<?php 
 										$servername = "127.0.0.1";
 										$username = "root";
@@ -392,18 +391,17 @@
 										$conn = new mysqli($servername, $username, $password, $dbname);
 										$sql = "SELECT * FROM services ORDER BY id DESC";
 										$datasets = $conn->query($sql);				
-										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="%s"> %s </a> </li>';
+										$format = '<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="%s"> %s - %d </a> </li>';
 
 										$actual_link = "http://" . $_SERVER['SERVER_NAME'];
 										while($row = $datasets->fetch_assoc()) {
 											// $url = $strtok($_SERVER["REQUEST_URI"],'?');
-								        	echo sprintf($format, $actual_link."/results?user=".$user."&serviceid=".$row["serviceid"], $row["process_name"]);
+								        	echo sprintf($format, $actual_link."/results.php?uid=".$uid."&serviceid=".$row["serviceid"], $row["process_name"], $row["id"]);
 								    	}
 								    	$conn->close();
 								    ?>
-
-									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="#"> Demo1 </a> </li>
-									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="#"> Demo2 </a> </li>
+								    <!-- 
+									<li class="service" style="margin-bottom:2px; cursor:pointer; border: solid 1px; padding-left: 5px; background-color=#90EE90;"> <a href="#"> Demo1 </a> </li> -->
 								</ul>
 							</div> <!-- services column ENDs -->
 						</div><!-- main row div ENDs -->
@@ -483,6 +481,8 @@
 				var json_obj = formDataToJSON('form_anomalydetectionvec');			
 				json_obj["input_db"] = "ad";
 				json_obj["input_table"] = "ts_Yahoo_A1Benchmark_real_1"; // TODO
+				json_obj['uid'] = "<?php echo $uid ?>";
+				json_obj['process_name'] = "Twitter Vec";
 				var x = JSON.stringify(getQueryParams($('#form_anomalydetectionvec #x').serialize()));
 
 				// serviceid
@@ -492,20 +492,47 @@
 				   url: "php/generate-uid.php",
 				   async: true,
 				   success: function(data){
-				      console.log(data);
+				      // console.log(data);
 		      		  serviceid = data;
 		      		  json_obj["serviceid"] = serviceid;
 		      		  var json_html = JSON.stringify(json_obj, undefined, 2);
-		      		  document.getElementById("twitterdemo").innerHTML = json_html;
 
+		      		  // document.getElementById("twitterdemo").innerHTML = json_html;
+
+		      		  var location = window.location.href;
+		      		  if (location.includes('?')){
+    	    			var n = location.indexOf('?');
+			        	location = 	location.substring(0,n);			        	
+			          }
+		          
 		      		  // call the R method
 		      		  $.ajax({
 						   type: "POST",
 						   url: "http://localhost:8000/twitter",
 						   async: true,
-						   //data: '{"x":"ts_Yahoo_A1Benchmark_real_1"}',
 						   data: JSON.stringify(json_obj),
 						   success: function(data){
+						   	  document.getElementById("twitterdemo").innerHTML = JSON.stringify(data);
+
+						   	  // add algo
+						   	  $.ajax({
+								   type: "POST",
+								   url: "php/algo.php",
+								   async: true,
+								   data: {"serviceid":json_obj['serviceid'], "actual_link":location},
+								   success: function(data){  		
+								   	  $("#services").prepend(data);						   	  
+								      // console.log(data);
+								      return true;
+								   },
+								   complete: function() {},
+								   error: function(xhr, textStatus, errorThrown) {
+								     console.log('twittervec algo ajax loading error...');
+								     return false;
+								   }
+								});
+
+
 						      console.log(data);
 						      return true;
 						   },
