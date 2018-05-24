@@ -443,9 +443,14 @@
 					 window.open(location, '_self');
 				});			
 
+				$(document).keyup(function(e) {
+				     if (e.keyCode == 27) { // escape key maps to keycode `27`
+				         if (confirm('Loggint Out now..')) {
+							$(".logout").click();
+						 }				         
+				    }
+				});
 
-				// REMOVE
-				$("#form_anomalydetectionvec option:last").attr("selected", "selected"); 
 			});
 
 			function nab_numenta(){
