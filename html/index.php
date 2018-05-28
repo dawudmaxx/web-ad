@@ -150,14 +150,16 @@
 									<!-- module 1 -->
 									<div class="col-md-4 module nab">
 										<div class="row">
+											<!--
 											<a href="#" class="clearfix">
 											<span class="glyphicon glyphicon-chevron-right pull-right" id="right-arrow" aria-hidden="true"></span>
 										    </a>
+										    -->
 											<form id="form_nab" action="http://0.0.0.0:4000/methods/random" method="get" target="iframe-output">
 												<ul style="list-style: none;">
 													<h2>NAB Numenta</h2>
 													<li>
-														Datasets: 
+														Dataset: 
 														<select name="x">
 														<?php 
 															$servername = "127.0.0.1";
@@ -219,7 +221,7 @@
 												<ul style="list-style: none;">
 													<h2>Twitter Anomaly Detection Timeseries</h2>
 												<li>
-													Datasets:
+													Dataset:
 													<select name="x">
 													<?php 
 														$servername = "127.0.0.1";
@@ -297,7 +299,7 @@
 												<ul style="list-style: none;">
 													<h2>Twitter Anomaly Detection Vector</h2>
 												<li>
-													Datasets: 
+													Dataset: 
 													<select id="x" name="x">
 													<?php 
 														$servername = "127.0.0.1";
@@ -333,7 +335,7 @@
 												</li>
 											    
 											    <li>
-													Period: <input type="text" name="period" value="NULL">	
+													Period: <input type="text" name="period" value="2">	
 												</li>
 
 												<li>
@@ -445,7 +447,7 @@
 
 				$(document).keyup(function(e) {
 				     if (e.keyCode == 27) { // escape key maps to keycode `27`
-				         if (confirm('Loggint Out now..')) {
+				         if (confirm('Logging Out now..')) {
 							$(".logout").click();
 						 }				         
 				    }
